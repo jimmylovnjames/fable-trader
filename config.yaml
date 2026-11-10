@@ -1,0 +1,12 @@
+# fable-trader settings. Anything omitted uses the default in fabletrader/config.py.
+exchange: kraken        # any ccxt id: kraken, coinbase, okx, kucoin, binance, ...
+quote: USD              # what you deposit: USD, USDT, USDC, EUR ...
+assets: [BTC, ETH]
+
+target_vol: 0.60        # lower = smaller positions, shallower drawdowns
+max_exposure: 1.0       # max fraction of the account invested (never > 1, no leverage)
+rebalance_band: 0.10    # ignore weight drifts smaller than this (saves fees)
+max_drawdown: 0.50      # kill switch: sell everything and halt until `reset`
+
+min_order_quote: 10.0   # smallest order the bot will send
+paper_start_cash: 100.0
