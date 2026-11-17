@@ -46,6 +46,20 @@ Read this honestly:
   values give similar results (Sharpe 0.92-1.07), but BTC and ETH were chosen knowing they survived.
 - **You can lose money.** Only fund it with money you can afford to lose.
 
+## Ideas tested and rejected
+
+Both are reproducible from `research/` (they download their own data).
+
+- **Buy dips / sell bounces on small tokens** (`research/range_trading.py`): 10,280 hourly trades on
+  22 tokens since 2023. It wins 63% of the time but averages +0.05% per trade before fees. After
+  Kraken fees it lost money on all 22 tokens in every year. The bounces are smaller than the round-trip
+  fee, and an occasional −30% "dip" wipes out dozens of wins.
+- **This trend bot on a basket of altcoins** (`research/altcoin_basket.py`): 8–13% CAGR against about 30% for
+  BTC+ETH, with the same ~−46% drawdowns. The 8% comes from a point-in-time top-20 that includes coins that
+  later died (LUNA, FTT and others); a basket hand-picked today looks about 5 points a year better only because
+  it contains survivors. Blending in altcoins lowered both return and Sharpe, and the basket version needs $500+
+  to trade at all.
+
 ## Quick start (paper)
 
 ```bash
@@ -74,7 +88,8 @@ Only Kraken has been exercised here.
 
 `.github/workflows/trade.yml` runs the bot once a day on GitHub Actions and commits `state.json` back.
 
-- It works as soon as this branch is the repository's default branch. It paper-trades by default.
+- It paper-trades by default and is already running daily on this repository. GitHub often starts
+  scheduled jobs hours late; that doesn't matter for a once-a-day strategy.
 - To go live: add repository secrets `EXCHANGE_API_KEY` and `EXCHANGE_API_SECRET`, then set
   repository variable `LIVE` to `true`. Delete any paper `state.json` first.
 - A failed run emails you. Keep the repository private: `state.json` holds your equity history.
@@ -113,4 +128,5 @@ fabletrader/backtest.py   historical replay
 fabletrader/broker.py     paper and live (ccxt) execution
 fabletrader/bot.py        daily cycle, state, kill switch
 tests/                    python -m pytest
+research/                 studies of rejected strategies
 ```

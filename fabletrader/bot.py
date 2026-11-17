@@ -61,6 +61,11 @@ def tick(cfg: Config, broker, state: dict, force: bool = False) -> bool:
     else:
         targets = latest_weights(closes, cfg)
 
+    sleeve = equity * cfg.max_exposure / len(cfg.assets)
+    if 0 < sleeve < cfg.min_order_quote:
+        log.warning("account too small: each asset can hold at most %.2f %s, below min_order_quote "
+                    "%.2f, so no buys will happen. Add funds or trade fewer assets.",
+                    sleeve, cfg.quote, cfg.min_order_quote)
     log.info("bar %s | equity %.2f %s | drawdown %.1f%% | targets %s", bar, equity, cfg.quote,
              drawdown * 100, {a: round(w, 3) for a, w in targets.items()})
     ok = True

@@ -93,3 +93,22 @@ def test_paper_tick_is_idempotent_and_kill_switch_flattens(tmp_path):
     cash, qty = broker.balances()
     assert sum(q * 20 for q in qty.values()) < cfg.min_order_quote * 2  # only dust left
     assert cash == pytest.approx(broker.book["cash"]) and cash > 0
+
+
+def test_config_rejects_band_that_blocks_all_buys(tmp_path):
+    from fabletrader.config import load_config
+    p = tmp_path / "c.yaml"
+    p.write_text("assets: [A, B, C, D, E, F, G, H, I, J, K, L]\n")  # 12 assets, default band 0.10
+    with pytest.raises(ValueError, match="could never buy"):
+        load_config(p)
+    p.write_text("assets: [A, B, C, D, E, F, G, H, I, J, K, L]\nrebalance_band: 0.015\n")
+    assert load_config(p).rebalance_band == 0.015
+    assert load_config(tmp_path / "missing.yaml").assets == ["BTC", "ETH"]
+
+
+def test_small_account_warns(tmp_path, caplog):
+    cfg = Config(state_file=str(tmp_path / "s.json"), paper_start_cash=15.0)
+    state = {}
+    broker = PaperBroker(FakeExchange(prices(drift=0.004)), cfg, state)
+    tick(cfg, broker, state)
+    assert "account too small" in caplog.text

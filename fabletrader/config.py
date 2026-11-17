@@ -68,4 +68,10 @@ def load_config(path: str | Path = "config.yaml") -> Config:
         raise ValueError("max_exposure must be in (0, 1] - this bot never uses leverage")
     if not cfg.assets:
         raise ValueError("assets must not be empty")
+    sleeve = cfg.max_exposure / len(cfg.assets)
+    if cfg.rebalance_band >= sleeve:
+        raise ValueError(
+            f"rebalance_band {cfg.rebalance_band} >= the most any one asset can hold "
+            f"({sleeve:.3f} of equity with {len(cfg.assets)} assets): the bot could never buy. "
+            f"Lower rebalance_band, e.g. to {sleeve / 5:.3f}.")
     return cfg
