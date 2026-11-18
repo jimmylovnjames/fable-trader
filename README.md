@@ -60,6 +60,13 @@ Both are reproducible from `research/` (they download their own data).
   it contains survivors. Blending in altcoins lowered both return and Sharpe, and the basket version needs $500+
   to trade at all.
 
+- **Fast trading on meme coins, DeFi tokens and new listings** (`research/fast_trading.py`, `new_listings.py`,
+  `fade_perps.py`): hourly data on 300+ coins since 2023, delisted coins included.
+  - Buying new listings: about 70% are lower 30 days later; every group listed since 2021 averaged −54% to −75% after a year, apart from 2023.
+  - Chasing pumps and buying 24h/48h breakouts: about 0% to −5% per trade *before* fees, worse after.
+  - Shorting pumps with perpetual futures: looks good on spot prices, but real funding (~0.6% per trade on
+    new listings) erases it. A $100 account simulation ends at $4–$21 depending on the stop-loss.
+
 ## Quick start (paper)
 
 ```bash
@@ -128,5 +135,5 @@ fabletrader/backtest.py   historical replay
 fabletrader/broker.py     paper and live (ccxt) execution
 fabletrader/bot.py        daily cycle, state, kill switch
 tests/                    python -m pytest
-research/                 studies of rejected strategies
+research/                 studies of rejected strategies (data downloads to research/data/, not committed)
 ```
