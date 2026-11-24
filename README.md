@@ -66,6 +66,40 @@ Both are reproducible from `research/` (they download their own data).
   - Chasing pumps and buying 24h/48h breakouts: about 0% to −5% per trade *before* fees, worse after.
   - Shorting pumps with perpetual futures: looks good on spot prices, but real funding (~0.6% per trade on
     new listings) erases it. A $100 account simulation ends at $4–$21 depending on the stop-loss.
+- **Polymarket** (`research/fetch_polymarket.py`, `polymarket_calibration.py`): 10,000 resolved yes/no markets sampled
+  from 131,800 with $10k+ volume since January 2025, priced 1–168 hours before their scheduled end.
+  - Buying "safe" favorites (90¢+) loses 0.4–4% per dollar: favorites win *less* often than their price says.
+  - Long shots (10¢ or less) in markets with $250k+ volume lose 30–58% per dollar.
+  - Long shots in thin markets (under $250k) look profitable even at the real asking price (about 1.25× the
+    midpoint, measured on live order books), mostly in sports. But the result was negative in 2025, positive only in 2026,
+    and roughly 2 standard deviations after many slices of the data, so it is **unproven**. `polypaper/` forward-tests it with paper bets.
+  - Sports markets have charged takers `0.05 × shares × p × (1 − p)` since April 2026 (about 4.75% of the stake at 5¢).
+- **pump.fun** (`research/collect_pumpfun.py`, `pumpfun_graduation.py`, `pumpfun_snipe.py`): every new coin
+  recorded for 80 minutes on 2026-11-24, priced with GeckoTerminal minute candles.
+  - Of the SOL-priced coins followed for 40 minutes, under 1% graduated, about 75% were back at or below the starting price,
+    and about 2% ever reached a $20k market cap.
+  - Buying at graduation: the median coin was down 89% an hour later and 96% a day later. 27 of 28 coins with clean data
+    were down within 6 hours, and 96% had lost more than half within a day. All the excluded coins either had bad data or
+    crashed in their first 15 minutes.
+  - Sniping new coins: buying in the first minute and selling at +100%, at −50%, or after 30 minutes averaged
+    **−10.7% per trade** (95% range −18% to −3%) and won 15% of trades. Every other exit tried lost 8–26% per trade:
+    letting winners run, a +400% target, or just holding 5 or 30 minutes. Sample: 168 coins drawn by peak market cap
+    from 976 and re-weighted (`pumpfun_snipe_exits.py`, `pumpfun_snipe_robust.py`). This replay already assumes
+    fills at candle prices. Real bots that trade in the launch block get in ahead of you.
+
+## Polymarket paper test
+
+Paper only. It places no orders and needs no wallet or keys.
+
+```bash
+python -m polypaper run      # record new $1 paper bets on long shots (1-10¢) in thin markets ending in 4-30h,
+                             # at the real best ask with Polymarket's taker fee, and settle resolved ones
+python -m polypaper report   # wins vs. what the prices implied, by category
+```
+
+Run it a few times a day, for example from cron or a scheduled GitHub Action (not set up here). Results go to
+`polymarket_paper.json`. Do not put money in unless sports shows z > 2 after 300+ settled bets. Polymarket's
+international site blocks US users; check what is legal where you live before trading it.
 
 ## Quick start (paper)
 
@@ -135,5 +169,6 @@ fabletrader/backtest.py   historical replay
 fabletrader/broker.py     paper and live (ccxt) execution
 fabletrader/bot.py        daily cycle, state, kill switch
 tests/                    python -m pytest
+polypaper/                paper forward test of the Polymarket long-shot idea
 research/                 studies of rejected strategies (data downloads to research/data/, not committed)
 ```
